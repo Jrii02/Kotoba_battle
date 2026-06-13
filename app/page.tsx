@@ -96,11 +96,12 @@ export default function KotobaBattlePage() {
     setHighScores(loadHighScores());
   }, []);
 
-  // Auto-focus input when question changes / game restarts.
+  // Auto-focus input when game starts / restarts (bukan tiap soal berubah,
+  // supaya keyboard HP tidak dismiss-lalu-muncul di setiap pergantian soal).
   useEffect(() => {
     if (!inGame || gameOver) return;
     inputRef.current?.focus();
-  }, [questionNum, gameOver, inGame]);
+  }, [inGame, gameOver]);
 
   // Countdown timer: restart on each new question. Pause selama reveal.
   useEffect(() => {
@@ -169,6 +170,9 @@ export default function KotobaBattlePage() {
     setQuestionNum((q) => q + 1);
     setInput("");
     questionStartRef.current = Date.now();
+    // Re-focus tanpa lewat useEffect supaya keyboard HP tidak dismiss.
+    // setTimeout(0) memastikan DOM sudah selesai update sebelum focus dipanggil.
+    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function triggerCorrect(word: Word) {
@@ -316,7 +320,7 @@ export default function KotobaBattlePage() {
   const showRevealKanji = revealKanji && revealKanji !== revealKana;
 
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-slate-100">
+    <main className="kb-full-height relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-slate-100">
       <style>{`
         @keyframes kb-shake {
           0%, 100% { transform: translateX(0); }
@@ -331,6 +335,18 @@ export default function KotobaBattlePage() {
           50% { opacity: 0.6; }
         }
         .kb-pulse { animation: kb-pulse 3s ease-in-out infinite; }
+        /* Fallback min-height untuk browser Android yang belum support dvh dengan benar */
+        .kb-full-height {
+          min-height: 100vh;
+          min-height: 100dvh;
+        }
+        /* Game container: pakai overflow-y-auto supaya konten bisa di-scroll
+           kalau viewport terhitung lebih kecil dari konten (bug dvh di beberapa HP) */
+        .kb-game-container {
+          min-height: 100vh;
+          min-height: 100dvh;
+          overflow-y: auto;
+        }
       `}</style>
 
       <div
@@ -339,7 +355,7 @@ export default function KotobaBattlePage() {
       />
 
       {!inGame ? (
-        <div className="relative mx-auto flex min-h-dvh w-full max-w-4xl flex-col items-stretch justify-center p-4 sm:p-8">
+        <div className="kb-full-height relative mx-auto flex w-full max-w-4xl flex-col items-stretch justify-center p-4 sm:p-8">
           <header className="mb-10 text-center">
             <h1 className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-4xl font-bold tracking-wider text-transparent sm:text-5xl">
               ⚔ Kotoba Battle ⚔
@@ -433,7 +449,7 @@ export default function KotobaBattlePage() {
           </div>
         </div>
       ) : (
-        <div className="relative mx-auto flex min-h-dvh w-full max-w-4xl flex-col items-stretch justify-start p-3 sm:justify-center sm:p-8">
+        <div className="kb-game-container relative mx-auto flex w-full max-w-4xl flex-col items-stretch justify-start p-3 sm:justify-center sm:p-8">
           <header className="mb-2 text-center sm:mb-4">
             <h1 className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-2xl font-bold tracking-wider text-transparent sm:text-4xl">
               ⚔ Kotoba Battle ⚔
