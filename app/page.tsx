@@ -449,7 +449,7 @@ export default function KotobaBattlePage() {
           </div>
         </div>
       ) : (
-        <div className="kb-game-container relative mx-auto flex w-full max-w-4xl flex-col items-stretch justify-start p-3 sm:justify-center sm:p-8">
+        <div className="kb-game-container relative mx-auto flex w-full max-w-4xl flex-col items-stretch justify-center p-3 pb-8 sm:p-8">
           <header className="mb-2 text-center sm:mb-4">
             <h1 className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-2xl font-bold tracking-wider text-transparent sm:text-4xl">
               ⚔ Kotoba Battle ⚔
